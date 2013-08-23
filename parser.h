@@ -4,7 +4,7 @@
 #include "enums.h"
 #include "command.h"
 
-ParseError parseCommand(const std::string& cmdString, Cmd::Command** result);
+Error parseCommand(const std::string& cmdString, Cmd::Command** result);
 
 
 #endif // __PARSER__

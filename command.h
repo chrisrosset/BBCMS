@@ -1,18 +1,19 @@
-#ifndef __ORDER__
-#define __ORDER__
+#ifndef __COMMAND__
+#define __COMMAND__
 
 #include <vector>
 #include "enums.h"
 
 
-typedef unsigned int OrderId;
+typedef int OrderId;
 
 namespace Cmd
 {
 
 struct Command
 {
-    const DealerId dealerId;
+    DealerId dealerId;
+    virtual ~Command() {};
 
 protected:
     Command(DealerId dId) : dealerId(dId) {};
@@ -20,13 +21,19 @@ protected:
 
 struct Post : Command
 {
-    const Side side;
-    const Commodity commodity;
-    const int amount;
-    const double price;
+    Side side;
+    Commodity commodity;
+    int amount;
+    double price;
 
+    Post()
+        : Command(_INVALID_DEALER), side(BUY), commodity(_INVALID_COMMODITY),
+            amount(0), price(0) {};
     Post(DealerId dId, Side s, Commodity cmdt, int amt, double p)
         : Command(dId), side(s), commodity(cmdt), amount(amt), price(p) {};
+    Post(const Post& o)
+        : Command(o.dealerId), side(o.side), commodity(o.commodity),
+            amount(o.amount), price(o.price) {};
 };
 
 struct Revoke : Command
@@ -63,4 +70,4 @@ struct Aggress : Command
 
 } // end namespace Cmd
 
-#endif // __ORDER__
+#endif // __COMMAND__

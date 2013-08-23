@@ -8,7 +8,30 @@
 #include "enums.h"
 #include "command.h"
 
-ParseError parseCheck(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
+Error parseAggress(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
+{
+    if(tokens.size() < 4 || tokens.size() % 2 != 0)
+        return INVALID_MESSAGE;
+
+    std::vector<OrderId> orderIds;
+    std::vector<int> amounts;
+
+    OrderId curId;
+    int curAmount;
+
+    for(int i = 2; i < tokens.size(); i+= 2) {
+        std::istringstream(tokens[i]) >> curId;
+        orderIds.push_back(curId);
+        std::istringstream(tokens[i+1]) >> curAmount;
+        amounts.push_back(curAmount);
+    }
+
+    *result = new Cmd::Aggress(dId, orderIds, amounts);
+    return NO_ERROR;
+}
+
+
+Error parseCheck(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
 {
     if(tokens.size() != 3)
         return INVALID_MESSAGE;
@@ -17,38 +40,64 @@ ParseError parseCheck(DealerId dId, std::vector<std::string>& tokens, Cmd::Comma
     std::istringstream(tokens[2]) >> oId;
 
     *result = new Cmd::Check(dId, oId);
+    return NO_ERROR;
 }
 
-DealerId parseDealerId(std::string& input)
+Error parseList(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
 {
-    DealerId result = _INVALID_DEALER;
+    if(tokens.size() < 2 || tokens.size() > 5)
+        return INVALID_MESSAGE;
 
-    if     (input == "DB"  ) { result = DB   ; }
-    else if(input == "JPM" ) { result = JPM  ; }
-    else if(input == "UBS" ) { result = UBS  ; }
-    else if(input == "RBC" ) { result = RBC  ; }
-    else if(input == "BARX") { result = BARX ; }
-    else if(input == "MS " ) { result = MS   ; }
-    else if(input == "CITI") { result = CITI ; }
-    else if(input == "BOFA") { result = BOFA ; }
-    else if(input == "RBS" ) { result = RBS  ; }
-    else if(input == "HSBC") { result = HSBC ; }
+    Commodity cmdt = _INVALID_COMMODITY;
+    DealerId idToCheck = _INVALID_DEALER;
 
-    return result;
+    if(tokens.size() > 2 && ((cmdt = parseCommodity(tokens[2])) == _INVALID_COMMODITY))
+        return UNKNOWN_COMMODITY;
+
+    if(tokens.size() == 4 && ((idToCheck = parseDealerId(tokens[3])) == _INVALID_DEALER))
+        return UNKNOWN_DEALER;
+
+    *result = new Cmd::List(dId, cmdt, idToCheck);
+    return NO_ERROR;
 }
 
-CommandType parseCommandType(std::string& input)
+Error parsePost(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
 {
-    CommandType result;
+    if(tokens.size() != 6)
+        return INVALID_MESSAGE;
 
-    if     (input == "LIST"  ) { result = LIST   ; }
-    else if(input == "AGGRESS" ) { result = AGGRESS  ; }
-    else if(input == "CHECK" ) { result = CHECK  ; }
-    else if(input == "REVOKE" ) { result = REVOKE; }
-    else if(input == "POST") { result = POST ; }
-    else { result = _INVALID_COMMAND; }
+    double price = 0;
+    int amount   = 0;
+    Side side;
+    if(tokens[2] == "BUY") {
+        side = BUY;
+    } else if (tokens[2] == "SELL") {
+        side = SELL;
+    } else {
+        return INVALID_MESSAGE;
+    }
 
-    return result;
+    Commodity cmdt = _INVALID_COMMODITY;
+    if((cmdt = parseCommodity(tokens[3])) == _INVALID_COMMODITY)
+        return UNKNOWN_COMMODITY;
+
+    std::istringstream(tokens[4]) >> amount;
+    std::istringstream(tokens[5]) >> price;
+
+    *result = new Cmd::Post(dId, side, cmdt, amount, price);
+    return NO_ERROR;
+}
+
+Error parseRevoke(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
+{
+    if(tokens.size() != 3)
+        return INVALID_MESSAGE;
+
+    OrderId oId;
+    std::istringstream(tokens[2]) >> oId;
+
+    *result = new Cmd::Revoke(dId, oId);
+    return NO_ERROR;
 }
 
 std::vector<std::string> splitTokens(const std::string& stringToSplit)
@@ -67,7 +116,7 @@ std::vector<std::string> splitTokens(const std::string& stringToSplit)
 }
 
 
-ParseError parseCommand(const std::string& cmdString, Cmd::Command** result)
+Error parseCommand(const std::string& cmdString, Cmd::Command** result)
 {
     if(cmdString.length() > 255)
         return INVALID_MESSAGE;
@@ -85,22 +134,23 @@ ParseError parseCommand(const std::string& cmdString, Cmd::Command** result)
         return INVALID_MESSAGE;
 
     switch(type) {
-        //case AGGRESS:
-
-        //    break;
+        case AGGRESS:
+            return parseAggress(dId, tokens, result);
+            break;
         case CHECK:
-            std::cout << "CHECK ONE TWO" << std::endl;
             return parseCheck(dId, tokens, result);
             break;
-        //case LIST:
-
-        //    break;
-        //case POST:
-
-        //    break;
-        //case REVOKE:
-
-        //    break;
+        case LIST:
+            return parseList(dId, tokens, result);
+            break;
+        case POST:
+            return parsePost(dId, tokens, result);
+            break;
+        case REVOKE:
+            return parseRevoke(dId, tokens, result);
+            break;
+        default:
+            return INVALID_MESSAGE;
     }
 }
 

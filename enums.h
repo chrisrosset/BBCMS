@@ -1,6 +1,8 @@
 #ifndef __ENUMS__
 #define __ENUMS__
 
+#include <string>
+
 enum DealerId
 {
     DB,
@@ -19,11 +21,18 @@ enum DealerId
     _INVALID_DEALER
 };
 
+DealerId parseDealerId(std::string& input);
+std::string dealerIdToString(DealerId input);
+
 enum Side
 {
     BUY,
-    SELL
+    SELL,
+    _INVALID_SIDE
 };
+
+Side parseSide(std::string& input);
+std::string sideToString(Side input);
 
 enum Commodity
 {
@@ -31,8 +40,12 @@ enum Commodity
     SILV,
     PORK,
     OIL,
-    RICE
+    RICE,
+    _INVALID_COMMODITY
 };
+
+Commodity parseCommodity(std::string& input);
+std::string commodityToString(Commodity input);
 
 enum CommandType
 {
@@ -44,12 +57,17 @@ enum CommandType
     _INVALID_COMMAND
 };
 
-enum ParseError
+CommandType parseCommandType(std::string& input);
+
+enum Error
 {
+    UNAUTHORIZED,
     UNKNOWN_ORDER,
     UNKNOWN_DEALER,
     UNKNOWN_COMMODITY,
-    INVALID_MESSAGE
+    INVALID_MESSAGE,
+    NO_ERROR
 };
 
 #endif // __ENUMS__
+
