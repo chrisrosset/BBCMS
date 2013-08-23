@@ -1,2 +1,19 @@
-all:
-	g++ -std=c++0x orderstore.cpp enums.cpp parser.cpp main.cpp -o main
+CC=g++
+CFLAGS=-c -Wall -std=c++0x
+SOURCES=$(wildcard *.cpp)
+OBJECTS=$(SOURCES:.cpp=.o)
+EXECUTABLE=cms
+
+.PHONY: all
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
+
+.PHONY: clean
+clean:
+	rm $(OBJECTS)
+	rm $(EXECUTABLE)
