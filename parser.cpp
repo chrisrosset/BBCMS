@@ -19,7 +19,7 @@ Error parseAggress(DealerId dId, std::vector<std::string>& tokens, Cmd::Command*
     OrderId curId;
     int curAmount;
 
-    for(int i = 2; i < tokens.size(); i+= 2) {
+    for(unsigned int i = 2; i < tokens.size(); i+= 2) {
         std::istringstream(tokens[i]) >> curId;
         orderIds.push_back(curId);
         std::istringstream(tokens[i+1]) >> curAmount;
@@ -68,14 +68,10 @@ Error parsePost(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** r
 
     double price = 0;
     int amount   = 0;
-    Side side;
-    if(tokens[2] == "BUY") {
-        side = BUY;
-    } else if (tokens[2] == "SELL") {
-        side = SELL;
-    } else {
+
+    Side side    = parseSide(tokens[2]);
+    if(side == _INVALID_SIDE)
         return INVALID_MESSAGE;
-    }
 
     Commodity cmdt = _INVALID_COMMODITY;
     if((cmdt = parseCommodity(tokens[3])) == _INVALID_COMMODITY)
@@ -130,28 +126,30 @@ Error parseCommand(const std::string& cmdString, Cmd::Command** result)
         return UNKNOWN_DEALER;
 
     CommandType type = parseCommandType(tokens[1]);
-    if(type == _INVALID_COMMAND)
-        return INVALID_MESSAGE;
 
+    Error e;
     switch(type) {
         case AGGRESS:
-            return parseAggress(dId, tokens, result);
+            e = parseAggress(dId, tokens, result);
             break;
         case CHECK:
-            return parseCheck(dId, tokens, result);
+            e = parseCheck(dId, tokens, result);
             break;
         case LIST:
-            return parseList(dId, tokens, result);
+            e = parseList(dId, tokens, result);
             break;
         case POST:
-            return parsePost(dId, tokens, result);
+            e = parsePost(dId, tokens, result);
             break;
         case REVOKE:
-            return parseRevoke(dId, tokens, result);
+            e = parseRevoke(dId, tokens, result);
             break;
-        default:
-            return INVALID_MESSAGE;
+        case _INVALID_COMMAND:
+            e = INVALID_MESSAGE;
+            break;
     }
+
+    return e;
 }
 
 

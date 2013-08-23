@@ -32,7 +32,7 @@ void despatchCommand(OrderStore& store, Cmd::Command* ptr)
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     OrderStore store;
     std::string input;
