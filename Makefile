@@ -1,5 +1,10 @@
+
+
+
+
 CC=g++
 CFLAGS=-c -Wall
+LDFLAGS=-L/usr/lib -lpthread -lboost_system
 SOURCES=$(wildcard *.cpp)
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=cms
@@ -8,7 +13,7 @@ EXECUTABLE=cms
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@
+	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
 
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
