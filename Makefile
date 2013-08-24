@@ -1,7 +1,3 @@
-
-
-
-
 CC=g++
 CFLAGS=-c -Wall
 LDFLAGS=-L/usr/lib -lpthread -lboost_system
@@ -20,5 +16,5 @@ $(EXECUTABLE): $(OBJECTS)
 
 .PHONY: clean
 clean:
-	rm $(OBJECTS)
-	rm $(EXECUTABLE)
+	-rm -f $(OBJECTS)
+	-rm -f $(EXECUTABLE)
