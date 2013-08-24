@@ -1,5 +1,3 @@
-
-#include <map>
 #include "command.h"
 #include "orderstore.h"
 
@@ -12,7 +10,7 @@ OrderStore::OrderStore()
 //Error OrderStore::check(Cmd::Check);
 Error OrderStore::list(const Cmd::List& cmd, std::vector<Cmd::Post>& result)
 {
-    for(std::unordered_map<OrderId, Cmd::Post>::iterator it = store.begin();
+    for(boost::unordered_map<OrderId, Cmd::Post>::iterator it = store.begin();
             it != store.end(); ++it) {
 
         Cmd::Post cur = it->second;

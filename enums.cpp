@@ -75,8 +75,3 @@ std::string sideToString(Side input)
     else { return "INVALID SIDE"; }
 }
 
-
-
-
-
-

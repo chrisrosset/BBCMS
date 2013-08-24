@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 
 #include "enums.h"
 #include "command.h"

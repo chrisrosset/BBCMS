@@ -2,7 +2,7 @@
 #define __ORDERSTORE__
 
 
-#include <unordered_map>
+#include <boost/unordered_map.hpp>
 #include "command.h"
 
 
@@ -18,71 +18,10 @@ public:
     Error revoke(const Cmd::Revoke& cmd);
 
 private:
-    std::unordered_map<OrderId, Cmd::Post> store;
+    boost::unordered_map<OrderId, Cmd::Post> store;
     OrderId counter;
 };
 
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
