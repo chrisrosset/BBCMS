@@ -13,20 +13,17 @@ Error parseAggress(DealerId dId, std::vector<std::string>& tokens, Cmd::Command*
     if(tokens.size() < 4 || tokens.size() % 2 != 0)
         return INVALID_MESSAGE;
 
-    std::vector<OrderId> orderIds;
-    std::vector<int> amounts;
-
+    std::vector<std::pair<OrderId, int> > orders;
     OrderId curId;
     int curAmount;
 
     for(unsigned int i = 2; i < tokens.size(); i+= 2) {
         std::istringstream(tokens[i]) >> curId;
-        orderIds.push_back(curId);
         std::istringstream(tokens[i+1]) >> curAmount;
-        amounts.push_back(curAmount);
+        orders.push_back(std::make_pair(curId, curAmount));
     }
 
-    *result = new Cmd::Aggress(dId, orderIds, amounts);
+    *result = new Cmd::Aggress(dId, orders);
     return NO_ERROR;
 }
 

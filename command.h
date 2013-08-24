@@ -36,7 +36,7 @@ struct Post : Command
         : Command(o.dealerId), side(o.side), commodity(o.commodity),
             amount(o.amount), price(o.price) {};
 
-    std::string toString() {
+    std::string toString() const {
         std::stringstream ss;
         ss << dealerIdToString(dealerId) << " "
            << sideToString(side) << " "
@@ -72,11 +72,10 @@ struct List : Command
 
 struct Aggress : Command
 {
-    const std::vector<OrderId> orderIds;
-    const std::vector<int> orderAmounts;
+    const std::vector<std::pair<OrderId, int> > orders;
 
-    Aggress(DealerId dId, std::vector<OrderId> oIds, std::vector<int> oAmts)
-        : Command(dId), orderIds(oIds), orderAmounts(oAmts) {};
+    Aggress(DealerId dId, std::vector<std::pair<OrderId, int> > o)
+        : Command(dId), orders(o) {};
 };
 
 } // end namespace Cmd
