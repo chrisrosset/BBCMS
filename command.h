@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "enums.h"
+#include <sstream>
 
 
 typedef int OrderId;
@@ -34,6 +35,16 @@ struct Post : Command
     Post(const Post& o)
         : Command(o.dealerId), side(o.side), commodity(o.commodity),
             amount(o.amount), price(o.price) {};
+
+    std::string toString() {
+        std::stringstream ss;
+        ss << dealerIdToString(dealerId) << " "
+           << sideToString(side) << " "
+           << commodityToString(commodity) << " "
+           << amount << " "
+           << price;
+        return ss.str();
+    }
 };
 
 struct Revoke : Command
@@ -52,11 +63,11 @@ struct Check : Command
 
 struct List : Command
 {
-    const Commodity commodity;
-    const DealerId  dId;
+    const Commodity commodityFilter;
+    const DealerId  dealerFilter;
 
     List(DealerId clientId, Commodity c, DealerId listId)
-        : Command(clientId), commodity(c), dId(listId) {};
+        : Command(clientId), commodityFilter(c), dealerFilter(listId) {};
 };
 
 struct Aggress : Command

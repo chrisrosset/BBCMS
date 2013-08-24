@@ -13,7 +13,8 @@ public:
 
     //Error aggress(Cmd::Aggress);
     //Error check(Cmd::Check);
-    Error list(const Cmd::List& cmd, std::vector<Cmd::Post>&);
+    Error list(const Cmd::List& cmd, 
+    		   std::vector<std::pair<OrderId, Cmd::Post> >& result);
     Error post(Cmd::Post cmd, OrderId& id);
     Error revoke(const Cmd::Revoke& cmd);
 

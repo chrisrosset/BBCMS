@@ -8,17 +8,22 @@ OrderStore::OrderStore()
 
 //Error OrderStore::aggress(Cmd::Aggress);
 //Error OrderStore::check(Cmd::Check);
-Error OrderStore::list(const Cmd::List& cmd, std::vector<Cmd::Post>& result)
+Error OrderStore::list(const Cmd::List& cmd, 
+                       std::vector<std::pair<OrderId, Cmd::Post> >& result)
 {
     for(boost::unordered_map<OrderId, Cmd::Post>::iterator it = store.begin();
             it != store.end(); ++it) {
 
         Cmd::Post cur = it->second;
-
-        if((cmd.commodity == _INVALID_COMMODITY && cmd.dealerId == _INVALID_DEALER) ||
-           (cmd.commodity == cur.commodity && cmd.dealerId == _INVALID_DEALER) ||
-           (cmd.commodity == cur.commodity && cmd.dealerId == cur.dealerId)) {
-            result.push_back(cur);
+        
+        if((cmd.commodityFilter == _INVALID_COMMODITY 
+            && cmd.dealerFilter == _INVALID_DEALER) ||
+           (cmd.commodityFilter == cur.commodity 
+            && cmd.dealerFilter == _INVALID_DEALER) ||
+           (cmd.commodityFilter == cur.commodity 
+            && cmd.dealerFilter == cur.dealerId)) {
+            
+            result.push_back(std::make_pair(it->first, cur));
         }
     }
 
