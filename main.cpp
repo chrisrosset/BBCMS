@@ -29,10 +29,11 @@ std::string buildCheckResponse(const Cmd::Check& c, const Cmd::Post& p)
     std::stringstream ss;
     ss << c.orderId << " ";
 
-    if(p.amount > 0)
-        ss << p.toString();
-    else
+    if(p.amount > 0) {
+        ss << p.toString(); 
+   } else {
         ss << "HAS BEEN FILLED";
+   }
 
     ss << std::endl;
     return ss.str();
@@ -65,6 +66,8 @@ std::string buildRevokeResponse(OrderId orderId)
 
 ////
 
+// Commodity Market System Controller - coordinate parsed input 
+// and provide output in the form of system messages
 void despatchCommand(OrderStore& store, Cmd::Command* ptr)
 {
     if(Cmd::Aggress * c = dynamic_cast<Cmd::Aggress*>(ptr)) {
@@ -95,16 +98,15 @@ void despatchCommand(OrderStore& store, Cmd::Command* ptr)
         } else {
             std::cout << errorToString(e) << std::endl;
         }
-
     } else if(Cmd::Post * c = dynamic_cast<Cmd::Post*>(ptr)) {
         OrderId id = -1;
         Error e = store.post(*c, id);
+        
         if(e == NO_ERROR) {
             std::cout << buildPostResponse(id, *c);
         } else {
             std::cout << errorToString(e) << std::endl;
         }
-
     } else if(Cmd::Revoke * c = dynamic_cast<Cmd::Revoke*>(ptr)) {
         Error e = store.revoke(*c);
 
@@ -115,7 +117,6 @@ void despatchCommand(OrderStore& store, Cmd::Command* ptr)
         }
     }
 }
-
 
 int main(int argc, char* argv[])
 {
@@ -130,7 +131,7 @@ int main(int argc, char* argv[])
         std::cout << input << std::endl;
         if(input.length() > 255) {
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cerr << "INVALID MESSAGE" << std::endl;
+            std::cerr << "INVALID_MESSAGE" << std::endl;
         } else if(input.length() == 0) {
             return 0;
         }

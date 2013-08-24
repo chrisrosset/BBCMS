@@ -9,7 +9,6 @@ OrderStore::OrderStore()
 {
 }
 
-
 Error OrderStore::aggress(const Cmd::Aggress& cmd, std::vector<Cmd::Post>& result)
 {
     boost::unordered_map<OrderId, Cmd::Post> temp = store;
@@ -40,8 +39,6 @@ Error OrderStore::aggress(const Cmd::Aggress& cmd, std::vector<Cmd::Post>& resul
     return NO_ERROR;
 }
 
-
-
 Error OrderStore::check(const Cmd::Check& cmd, Cmd::Post& order)
 {
     // if id does not exist
@@ -55,7 +52,6 @@ Error OrderStore::check(const Cmd::Check& cmd, Cmd::Post& order)
     order = store[cmd.orderId];
     return NO_ERROR;
 }
-
 
 Error OrderStore::list(const Cmd::List& cmd,
                        std::vector<std::pair<OrderId, Cmd::Post> >& result)
@@ -78,7 +74,6 @@ Error OrderStore::list(const Cmd::List& cmd,
     return NO_ERROR;
 }
 
-
 Error OrderStore::post(Cmd::Post cmd, OrderId& id)
 {
     id = ++counter;
@@ -86,7 +81,6 @@ Error OrderStore::post(Cmd::Post cmd, OrderId& id)
     store.insert(x);
     return NO_ERROR;
 }
-
 
 Error OrderStore::revoke(const Cmd::Revoke& cmd)
 {

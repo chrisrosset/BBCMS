@@ -5,7 +5,7 @@
 #include <boost/unordered_map.hpp>
 #include "command.h"
 
-
+// OrderStore model class
 class OrderStore
 {
 public:

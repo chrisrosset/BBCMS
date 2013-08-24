@@ -5,12 +5,13 @@
 #include "enums.h"
 #include <sstream>
 
-
 typedef int OrderId;
 
+// Cmd namespace with command definitions
 namespace Cmd
 {
 
+// Base Command struct inherited by all types of commands
 struct Command
 {
     DealerId dealerId;
@@ -20,6 +21,7 @@ protected:
     Command(DealerId dId) : dealerId(dId) {};
 };
 
+// Post command
 struct Post : Command
 {
     Side side;
@@ -47,6 +49,7 @@ struct Post : Command
     }
 };
 
+// Revoke command
 struct Revoke : Command
 {
     const OrderId orderId;
@@ -54,6 +57,7 @@ struct Revoke : Command
     Revoke(DealerId dId, OrderId oId) : Command(dId), orderId(oId) {};
 };
 
+// Check command
 struct Check : Command
 {
     const OrderId orderId;
@@ -61,6 +65,7 @@ struct Check : Command
     Check(DealerId dId, OrderId oId) : Command(dId), orderId(oId) {};
 };
 
+// List command
 struct List : Command
 {
     const Commodity commodityFilter;
@@ -70,6 +75,7 @@ struct List : Command
         : Command(clientId), commodityFilter(c), dealerFilter(listId) {};
 };
 
+// Aggress command
 struct Aggress : Command
 {
     const std::vector<std::pair<OrderId, int> > orders;

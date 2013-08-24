@@ -1,6 +1,8 @@
 #include <string>
 #include "enums.h"
 
+// Utility functions for convering enums to strings
+
 DealerId parseDealerId(std::string& input)
 {
     if     (input == "DB"  ) { return DB   ; }
