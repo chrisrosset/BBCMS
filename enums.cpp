@@ -75,3 +75,13 @@ std::string sideToString(Side input)
     else { return "INVALID SIDE"; }
 }
 
+std::string errorToString(Error input)
+{
+    if     (input == UNAUTHORIZED )    { return "UNAUTHORIZED"  ; }
+    else if(input == UNKNOWN_ORDER)    { return "UNKNOWN_ORDER"; }
+    else if(input == UNKNOWN_DEALER)   { return "UNKNOWN_DEALER"; }
+    else if(input == UNKNOWN_COMMODITY){ return "UNKNOWN_COMMODITY"; }
+    else if(input == INVALID_MESSAGE ) { return "INVALID_MESSAGE"; }
+    else { return ""; }
+}
+

@@ -69,5 +69,7 @@ enum Error
     NO_ERROR
 };
 
+std::string errorToString(Error input);
+
 #endif // __ENUMS__
 
