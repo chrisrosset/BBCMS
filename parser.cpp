@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 
 #include "parser.h"
 #include "enums.h"
@@ -42,7 +43,7 @@ Error parseCheck(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** 
 
 Error parseList(DealerId dId, std::vector<std::string>& tokens, Cmd::Command** result)
 {
-    if(tokens.size() < 2 || tokens.size() > 5)
+    if(tokens.size() < 2 || tokens.size() > 4)
         return INVALID_MESSAGE;
 
     Commodity cmdt = _INVALID_COMMODITY;
@@ -114,7 +115,10 @@ Error parseCommand(const std::string& cmdString, Cmd::Command** result)
     if(cmdString.length() > 255)
         return INVALID_MESSAGE;
 
-    std::vector<std::string> tokens = splitTokens(cmdString);
+    std::string input = cmdString;
+    boost::algorithm::trim(input);
+    std::vector<std::string> tokens = splitTokens(input);
+
     if(tokens.size() < 2)
         return INVALID_MESSAGE;
 
