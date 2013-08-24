@@ -7,63 +7,8 @@
 #include "command.h"
 #include "parser.h"
 #include "orderstore.h"
+#include "outputbuilder.h"
 
-// functions for providing output Views
-
-std::string buildAggressResponse(const std::vector<Cmd::Post>& result)
-{
-    std::stringstream ss;
-    for(std::vector<Cmd::Post>::const_iterator it = result.begin();
-            it != result.end(); ++it) {
-        ss << (it->side == BUY ? "BOUGHT" : "SOLD") << " "
-           << it->amount << " "
-           << commodityToString(it->commodity) << " @ "
-           << it->price << " FROM "
-           << dealerIdToString(it->dealerId) << std::endl;
-    }
-
-    return ss.str();
-}
-
-std::string buildCheckResponse(const Cmd::Check& c, const Cmd::Post& p)
-{
-    std::stringstream ss;
-    ss << c.orderId << " ";
-
-    if(p.amount > 0) {
-        ss << p.toString();
-   } else {
-        ss << "HAS BEEN FILLED";
-   }
-
-    ss << std::endl;
-    return ss.str();
-}
-
-std::string buildListResponse(std::vector<std::pair<OrderId, Cmd::Post> > result)
-{
-    std::stringstream ss;
-    for(unsigned int i = 0; i < result.size(); ++i) {
-        ss << result[i].first << " "
-           << result[i].second.toString()
-           << std::endl;
-    }
-    return ss.str();
-}
-
-std::string buildPostResponse(OrderId id, const Cmd::Post& c)
-{
-    std::stringstream ss;
-    ss << id << " " << c.toString() << " HAS BEEN POSTED" << std::endl;
-    return ss.str();
-}
-
-std::string buildRevokeResponse(OrderId orderId)
-{
-    std::stringstream ss;
-    ss << orderId << " HAS BEEN REVOKED" << std::endl;
-    return ss.str();
-}
 
 ////
 
@@ -123,12 +68,12 @@ std::string despatchCommand(OrderStore& store, Cmd::Command* ptr)
 }
 
 
-int controlTcp()
+int controlTcp(unsigned int port)
 {
     using boost::asio::ip::tcp;
 
     boost::asio::io_service io_service;
-    tcp::endpoint endpoint(tcp::v4(), 8080);
+    tcp::endpoint endpoint(tcp::v4(), port);
     tcp::acceptor acceptor(io_service, endpoint);
 
     tcp::iostream stream;
@@ -210,11 +155,17 @@ int main(int argc, char* argv[])
     if (argc == 2 && 0 == strcmp(argv[1], "base")) {
         return controlStdio();
     } else if (argc == 3 && 0 == strcmp(argv[1], "ext1")) {
-        return controlTcp();
+        int port = strtol(argv[2], 0, 10);
+        return controlTcp(port);
     } else if (argc == 3 && 0 == strcmp(argv[1], "ext2")) {
         return 1;
     } else {
-        std::cout << "Help message. Very helpful." << std::endl;
+        std::cout << "BBCMS help" << std::endl
+                  << std::endl
+                  << "\t ./cms               - display this message\n"
+                  << "\t ./cms base          - run with stdio as IO\n"
+                  << "\t ./cms ext1 <port>   - run with tcp on <port> as IO\n"
+                  << "\t ./cms ext2 <port>   - not implemented\n";
         return 0;
     }
 }
