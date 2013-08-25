@@ -43,6 +43,12 @@ Other points:
 * eschewing exceptions (well-defined grammar makes for simple error detection)
 * hand-written parser (grammar too simple to justify the additional cost of 
   using a parser combinators or a lexer/parser generator)
+* the two control functions repeat some code. They could be generalised into
+  one common control interface with an abstract method control() and 
+  specialised implementations written in their own classes but given there's
+  only two at the moment and they only share one loop this was deemed as form
+  over function.
+
 
 
 
@@ -76,10 +82,10 @@ To build the project `cd` into the main project directory and run make.
     cd BBCMS
     make
 
-This will produce a binary called `cms` in the `bin` folder.
+This will produce a binary called `cms` in the folder.
 To run it from the project's main directory, execute:
 
-    ./bin/cms <arguments>
+    ./cms <arguments>
 
 
 Known Bugs
