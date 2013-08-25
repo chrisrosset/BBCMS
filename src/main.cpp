@@ -93,8 +93,7 @@ int controlTcp(unsigned int port)
             char cstr[257] = "";
             stream.get(cstr, 257);
 
-            std::string input = cstr;
-            stream << input << std::endl;
+            std::string input(cstr);
             if(stream.eof() || 0 == input.length()) {
                 return 0;
             } else if(input.length() > 255) {
@@ -109,9 +108,7 @@ int controlTcp(unsigned int port)
             Cmd::Command* ptr = 0;
             Error e = parseCommand(input, &ptr);
             if(e == NO_ERROR) {
-                std::string a = despatchCommand(store, ptr);
-                stream << a;
-                std::cout << a;
+                stream << despatchCommand(store, ptr);
             } else {
                 stream << errorToString(e) << std::endl;
             }
@@ -132,29 +129,26 @@ int controlStdio()
 
     while(true) {
         char cstr[257] = "";
-        stream.get(cstr, 257);
+        std::cin.get(cstr, 257);
 
-        std::string input = cstr;
-        stream << input << std::endl;
-        if(stream.eof() || 0 == input.length()) {
+        std::string input(cstr);
+        if(std::cin.eof() || 0 == input.length()) {
             return 0;
         } else if(input.length() > 255) {
             // proceed to ignore the rest of the invalid long msg
-            stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            stream << "INVALID_MESSAGE" << std::endl;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "INVALID_MESSAGE" << std::endl;
         }
 
-        std::getline(stream, temp);
+        std::getline(std::cin, temp);
 
         // parse and perform error detection
         Cmd::Command* ptr = 0;
         Error e = parseCommand(input, &ptr);
         if(e == NO_ERROR) {
-            std::string a = despatchCommand(store, ptr);
-            stream << a;
-            std::cout << a;
+            std::cout << despatchCommand(store, ptr);
         } else {
-            stream << errorToString(e) << std::endl;
+            std::cout << errorToString(e) << std::endl;
         }
 
         if(ptr != 0)
