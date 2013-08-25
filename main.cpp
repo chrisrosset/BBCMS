@@ -70,30 +70,78 @@ std::string despatchCommand(OrderStore& store, Cmd::Command* ptr)
 
 int controlTcp(unsigned int port)
 {
-    using boost::asio::ip::tcp;
+    if(port > 65535) {
+        std::cerr << "Invalid port number" << std::endl;
+        return 1;
+    }
 
-    boost::asio::io_service io_service;
-    tcp::endpoint endpoint(tcp::v4(), port);
-    tcp::acceptor acceptor(io_service, endpoint);
+    try {
+        using boost::asio::ip::tcp;
 
-    tcp::iostream stream;
-    boost::system::error_code ec;
-    acceptor.accept(*stream.rdbuf(), ec);
+        boost::asio::io_service io_service;
+        tcp::endpoint endpoint(tcp::v4(), port);
+        tcp::acceptor acceptor(io_service, endpoint);
 
+        tcp::iostream stream;
+        boost::system::error_code ec;
+        acceptor.accept(*stream.rdbuf(), ec);
+
+        OrderStore store;
+        std::string temp;
+
+        while(true) {
+            char cstr[257] = "";
+            stream.get(cstr, 257);
+
+            std::string input = cstr;
+            stream << input << std::endl;
+            if(stream.eof() || 0 == input.length()) {
+                return 0;
+            } else if(input.length() > 255) {
+                // proceed to ignore the rest of the invalid long msg
+                stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                stream << "INVALID_MESSAGE" << std::endl;
+            }
+
+            std::getline(stream, temp);
+
+            // parse and perform error detection
+            Cmd::Command* ptr = 0;
+            Error e = parseCommand(input, &ptr);
+            if(e == NO_ERROR) {
+                std::string a = despatchCommand(store, ptr);
+                stream << a;
+                std::cout << a;
+            } else {
+                stream << errorToString(e) << std::endl;
+            }
+
+            if(ptr != 0)
+                delete ptr;
+        }
+    } catch(std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
+}
+
+int controlStdio()
+{
     OrderStore store;
     std::string temp;
 
     while(true) {
-        char cstr[257];
+        char cstr[257] = "";
         stream.get(cstr, 257);
 
         std::string input = cstr;
         stream << input << std::endl;
-        if(input.length() > 255) {
+        if(stream.eof() || 0 == input.length()) {
+            return 0;
+        } else if(input.length() > 255) {
+            // proceed to ignore the rest of the invalid long msg
             stream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             stream << "INVALID_MESSAGE" << std::endl;
-        } else if(input.length() == 0) {
-            return 0;
         }
 
         std::getline(stream, temp);
@@ -107,41 +155,6 @@ int controlTcp(unsigned int port)
             std::cout << a;
         } else {
             stream << errorToString(e) << std::endl;
-        }
-
-        if(ptr != 0)
-            delete ptr;
-    }
-
-}
-
-int controlStdio()
-{
-    OrderStore store;
-    std::string temp;
-
-    while(true) {
-        char cstr[257];
-        std::cin.get(cstr, 257);
-
-        std::string input = cstr;
-        std::cout << input << std::endl;
-        if(input.length() > 255) {
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "INVALID_MESSAGE" << std::endl;
-        } else if(input.length() == 0) {
-            return 0;
-        }
-
-        std::getline(std::cin, temp);
-
-        // parse and perform error detection
-        Cmd::Command* ptr = 0;
-        Error e = parseCommand(input, &ptr);
-        if(e == NO_ERROR) {
-            std::cout << despatchCommand(store, ptr);
-        } else {
-            std::cout << errorToString(e) << std::endl;
         }
 
         if(ptr != 0)
